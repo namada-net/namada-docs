@@ -1,14 +1,19 @@
+import { Callout } from 'nextra-theme-docs'
+
 # Shielded Transfers
 
-You can construct shielded transfers similarly to transparent transfers, except that rather than providing implicit addresses as the `source` and `target`, 
-you will need to provide a spending key and payment address, respectively.  
+You can construct shielded transfers similarly to transparent transfers, except
+that rather than providing implicit addresses as the `source` and `target`, you
+will need to provide a spending key and payment address, respectively.
 
-Before building your transaction, you will want to make sure the [shielded wallet is synced](./shielded-sync.mdx).
+Before building your transaction, you will want to make sure the
+[shielded wallet is synced](./shielded-sync.mdx).
 
 ### Constructing the Transfer
 
-This example assumes you have a spending key with sufficient shielded balance, a recipient payment address, and the 
-public key of an implicit account with gas funds.
+This example assumes you have a spending key with sufficient shielded balance, a
+recipient payment address, and the public key of an implicit account with gas
+funds.
 
 ```rust
 use namada_sdk::Namada;
@@ -57,3 +62,32 @@ async fn construct_transfer(sdk: impl Namada) {
     }
 }
 ```
+
+### Frontend sustainability fee
+
+For transactions that move assets into or out of the shielded pool, the namada
+SDK provides the possibility to charge an optional fee to support the operations
+of the frontend provider. The specific transactions are:
+
+- `TxShieldingTransfer`
+- `TxUnshieldingTransfer`
+- `TxOsmosisSwap`
+- `TxIbcTransfer`
+- `GenIbcShieldingTransfer`
+
+<Callout type="warning">
+  For fully shielded osmosis swaps (from shieleded address to shielded address),
+  the operator should refrain from charging a fee.
+</Callout>
+
+These structures provide an optional field in one of two forms:
+
+```rust
+  pub frontend_sus_fee: Option<(C::TransferTarget, Dec)>,
+  pub frontend_sus_fee: Option<(C::PaymentAddress, Dec)>,
+```
+
+where the first element of the tuple is the receiver of the fee (an address
+controlled by the operator) and the second one is the fee expressed as a
+percentage of the shielded/unshielded amount. This percentage will be charged on
+top of the amount specified by the user.
