@@ -1,5 +1,6 @@
 {
   "mainnets": "Mainnets",
   "testnets": "Testnets",
+  "services": "Public infra and services",
   "starting-network": "Starting a network"
 }
