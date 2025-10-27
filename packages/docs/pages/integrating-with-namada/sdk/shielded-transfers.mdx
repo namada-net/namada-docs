@@ -1,4 +1,4 @@
-import { Callout } from 'nextra-theme-docs'
+import { Callout } from "nextra-theme-docs";
 
 # Shielded Transfers
 
@@ -77,7 +77,9 @@ of the frontend provider. The specific transactions are:
 
 <Callout type="warning">
   For fully shielded osmosis swaps (from shieleded address to shielded address),
-  the operator should refrain from charging a fee.
+  the operator should refrain from charging a fee as the unshielding and
+  reshielding operations are only needed to perform the swap but the value
+  inside the shielded pool remains unchanged.
 </Callout>
 
 These structures provide an optional field in one of two forms:
@@ -89,5 +91,20 @@ These structures provide an optional field in one of two forms:
 
 where the first element of the tuple is the receiver of the fee (an address
 controlled by the operator) and the second one is the fee expressed as a
-percentage of the shielded/unshielded amount. This percentage will be charged on
-top of the amount specified by the user.
+percentage of the shielded/unshielded amount. By providing a value for this
+field, the SDK builder for the desired transaction will inject extra inputs (one
+for every source address) and an extra output to the transfer data (no batching
+required): more specifically, the provided percentage will be taken from every
+transfer's source on top of the amount specified by the user and sent to the
+provided target address. Whether these extra inputs/output are shielded or
+transparent depends on the specific transaction and its sources: when the
+transaction's source is transparent an extra trasparent input will be added to
+the `Transfer` data, whereas if the input is shielded another shieleded input
+will be added to the MASP `Transaction` section. The output can either be
+shielded or transparent when the above `frontend_sus_fee` specifies it via the
+`C::TransferTarget` type. For the `TxOsmosisSwap` and `GenIbcShieldingTransfer`
+transactions instead, the fee target can be specified only as a shielded payment
+address.
+
+The user will accept this fee when signing the transaction since this
+information will be available to them for review and acceptance at that time.
