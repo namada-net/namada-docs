@@ -37,9 +37,6 @@ jobs:
           - name: Build Docs image
             image: docs
             path: docs
-          - name: Build Docs image
-            image: community
-            path: community
 
     steps:
       - name: Checkout repo
@@ -81,9 +78,6 @@ jobs:
           - name: Docs docs
             path: docs
             bucket: namada-docs-frontend-prod
-          - name: Rpgf docs
-            path: community
-            bucket: namada-rpgf-frontend-prod
 
     steps:
       - name: Checkout repo
