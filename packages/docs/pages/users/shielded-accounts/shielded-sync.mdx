@@ -51,6 +51,17 @@ the chain. If this is not the case, a maximal height to sync to can be provided:
 namadac <$COMMAND> <$COMMAND_ARGS> --to-height $BLOCKHEIGHT
 ```
 
+### Standalone command
+
+Even though the sync operation is embedded in the commands that need it, it is
+also possible to run the sync command directly:
+
+```bash copy
+  namadac shielded-sync
+```
+
+The arguments/options described in this document apply to this command as well.
+
 ## Interrupting
 
 If the shielded wallet is sufficiently behind the tip of the chain, the amount
