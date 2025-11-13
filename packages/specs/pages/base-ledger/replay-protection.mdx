@@ -143,7 +143,7 @@ The consistency of the storage subspace is critically important for the correct 
 
 In both `mempool_validation` and `process_proposal`, a check is performed
 (in conjunction with other checks, as described in the [relative section](#wrapper-checks)) on the digests against the storage to ensure that the transaction has not been executed yet. If this condition is not met, the tx is not included in the mempool or block, respectively. In `process_proposal` a
-temporary cache is used to prevent the replay of a wrapper transaction in the same block; it is instead allowed to include more than one transaction with the same raw header hash, since we cannot know, before execution, if the transaction(s) is valid, and we'll end up commiting its hash. If both headers
+temporary cache is used to prevent the replay of a wrapper transaction in the same block; it is instead allowed to include more than one transaction with the same raw header hash, since we cannot know, before execution, if the transaction(s) is valid, and we'll end up committing its hash. If both headers
 checks pass, the transaction is included in the block. The wrapper hash is then
 committed to storage in `finalize_block`. When we later execute the transactions' batches we check that the raw header hash is not present in storage (i.e. applied previously in this block) and we execute it. Depending on the outcome, we commit its hash to storage (we avoid committing the hash only when the transaction runs out of gas or the commitments to the sections are invalid). If the raw header hash end up being committed we remove the corresponding wrapper header hash since it's redundant at this point.
 
