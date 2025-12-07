@@ -1,26 +1,33 @@
 # Shielded Sync
 
-Before performing MASP operations such as querying shielded balances, you will need to sync the local shielded wallet with the chain (this
-is equivalent to running the [`namadac shielded-sync`](../../users/shielded-accounts/shielded-sync.mdx) command when using the CLI).  
+Before performing MASP operations such as querying shielded balances, you will
+need to sync the local shielded wallet with the chain (the
+[CLI](../../users/shielded-accounts/shielded-sync.mdx) does this automatically
+for the involved commands).
 
-Syncing the shielded wallet directly from the chain is performance-intensive, so it's recommended to sync using a running
-instance of the [`namada-masp-indexer`](https://github.com/anoma/namada-masp-indexer).
+Syncing the shielded wallet directly from the chain is performance-intensive, so
+it's recommended to sync using a running instance of the
+[`namada-masp-indexer`](https://github.com/anoma/namada-masp-indexer).
 
-Instances of shielded wallets are not used directly, but are wrapped in a `shielded context` which adds capabilities
-to a shielded wallet for querying nodes and performing I/O.
+Instances of shielded wallets are not used directly, but are wrapped in a
+`shielded context` which adds capabilities to a shielded wallet for querying
+nodes and performing I/O.
 
 ### Example code
 
-This example demonstrates how to perform a shielded-sync from a masp-indexer endpoint, and save the synced context to disk.  
+This example demonstrates how to perform a shielded-sync from a masp-indexer
+endpoint, and save the synced context to disk.
 
 Add the following dependencies to your `Cargo.toml`:
+
 ```rust
 reqwest = "0.11.4"
 kdam = "0.5.2"
 ```
 
-Then, the following function will sync the shielded wallet from a given chain context and save it to the directory
-provided when [creating the context](./context.mdx).
+Then, the following function will sync the shielded wallet from a given chain
+context and save it to the directory provided when
+[creating the context](./context.mdx).
 
 ```rust
 use std::time::Duration;
@@ -115,4 +122,5 @@ async fn shielded_sync(sdk: impl Namada) {
 }
 ```
 
-In the above example, one would replace the URL in the `endpoint` with the proper URL for the desired MASP indexer.
+In the above example, one would replace the URL in the `endpoint` with the
+proper URL for the desired MASP indexer.

@@ -1,84 +1,118 @@
-import { Callout } from 'nextra-theme-docs'
+import { Callout } from "nextra-theme-docs";
 
 # Shielded Sync
 
-In order to interact with the MASP, users need a local copy of all of the notes. This is
-necessary to create new notes with the correct zk-proofs. Additionally, it is the only way
-for a client to find out which notes are owned by the user, which is necessary for calculating balances.
+In order to interact with the MASP, users need a local copy of all of the notes.
+This is necessary to create new notes with the correct zk-proofs. Additionally,
+it is the only way for a client to find out which notes are owned by the user,
+which is necessary for calculating balances.
 
-Shielded sync is the command that downloads and processes a local view of the MASP (up to
-a given block height) and then stores it locally in a `shielded wallet`. This command must be
-run periodically to stay in sync with the tip of the chain.
+Shielded sync is the command that downloads and processes a local view of the
+MASP (up to a given block height) and then stores it locally in a
+`shielded wallet`.
 
 ## Running shielded sync
 
-The simplest way to run shielded sync is via the command:
+The shielded sync command is invoked automatically by the cli commands that
+require it, namely:
+
+- `transfer`
+- `unshield`
+- `ibc-transfer` (when the source is shielded)
+- `balance` (when the owner is shielded)
+- `estimate-shielding-rewards`
+
+This assumes several things by default. It will look into the user's wallet and
+import any MASP keys into the shielded wallet. These will be the keys used to
+attempt to decrypt the downloaded MASP notes. Additional keys can be provided
+via:
+
 ```bash copy
-namadac shielded-sync
+namadac <$COMMAND> <$COMMAND_ARGS> --spending-keys $SPENDING_KEY
 ```
-This assumes several things by default. It will look into the user's wallet and import any MASP
-keys into the shielded wallet. These will be the keys used to attempt to decrypt the downloaded
-MASP notes. Additional keys can be provided via:
-```bash copy
-namadac shielded-sync --spending-keys $SPENDING_KEY
-```
+
 and / or
+
 ```bash copy
-namadac shielded-sync --viewing-keys $VIEWING_KEY
+namadac <$COMMAND> <$COMMAND_ARGS> --viewing-keys $VIEWING_KEY
 ```
 
 <Callout>
-The first time you wish to check the balance of a spending/viewing key, you must provide it to the shielded wallet with
-the `--spending-keys|--viewing-keys` argument. On subsequent runs, you can simply use `namadac shielded-sync`, as these
-keys will be stored in the shielded wallet.
+  The first time you wish to check the balance of a spending/viewing key, you
+  must provide it to the shielded wallet with the
+  `--spending-keys|--viewing-keys` argument. On subsequent runs this won't be
+  required, as these keys will be stored in the shielded wallet.
 </Callout>
 
-Shielded sync also assumes by default that the user wishes to sync to the tip of the chain. If this is not
-the case, a maximal height to sync to can be provided:
+Shielded sync also assumes by default that the user wishes to sync to the tip of
+the chain. If this is not the case, a maximal height to sync to can be provided:
+
 ```bash copy
-namadac shielded-sync --to-height $BLOCKHEIGHT
+namadac <$COMMAND> <$COMMAND_ARGS> --to-height $BLOCKHEIGHT
 ```
+
+### Standalone command
+
+Even though the sync operation is embedded in the commands that need it, it is
+also possible to run the sync command directly:
+
+```bash copy
+  namadac shielded-sync
+```
+
+The arguments/options described in this document apply to this command as well.
 
 ## Interrupting
 
-If the shielded wallet is sufficiently behind the tip of the chain, the amount of data to be downloaded
-and the computational load of processing it can be cumbersome. This is one reason why a user might
-wish to specify a maximal height to which to sync.
+If the shielded wallet is sufficiently behind the tip of the chain, the amount
+of data to be downloaded and the computational load of processing it can be
+cumbersome. This is one reason why a user might wish to specify a maximal height
+to which to sync.
 
-Additionally, the user can interrupt shielded sync at anytime by pressing `CTRL-C` or similar stop
-command. Shielded sync will receive this signal and save its work before stopping. This avoids
-losing work and can be resumed the next time shielded sync is run.
+Additionally, the user can interrupt shielded sync at anytime by pressing
+`CTRL-C` or similar stop command. Shielded sync will receive this signal and
+save its work before stopping. This avoids losing work and can be resumed the
+next time shielded sync is run.
 
 ## Using a MASP indexer
 
-A MASP indexer can do a lot of the processing of MASP data and make it available to users via a
-web server that can handle large downloads and many requests. This is in contrast to syncing
-by calling the RPC endpoints of node operators.
+A MASP indexer can do a lot of the processing of MASP data and make it available
+to users via a web server that can handle large downloads and many requests.
+This is in contrast to syncing by calling the RPC endpoints of node operators.
 
-Thus, the preferred and most efficient way to run shielded sync is by using an indexer:
+Thus, the preferred and most efficient way to run shielded sync is by using an
+indexer:
+
 ```bash copy
-namadac shielded-sync --with-indexer $INDEXER_API_URL
+namadac <$COMMAND> <$COMMAND_ARGS> --with-indexer $INDEXER_API_URL
 ```
-The api endpoint `$INDEXER_API_URL` will be a url to the indexer ending with `/api/v1`.
 
-Current publicly available MASP indexers can be discovered [here for mainnet](https://namada.community/infra/masp-indexers).
-In general, all infratsructure for both mainnets and testnets - including testnet MASP indexers - can be found in [this github repo](https://github.com/Luminara-Hub/namada-ecosystem/tree/main/user-and-dev-tools).
+The api endpoint `$INDEXER_API_URL` will be a url to the indexer ending with
+`/api/v1`.
+
+Current publicly available MASP indexers can be discovered
+[here for mainnet](https://namada.community/infra/masp-indexers). In general,
+all infrasructure for both mainnets and testnets - including testnet MASP
+indexers - can be found in
+[this github repo](https://github.com/Luminara-Hub/namada-ecosystem/tree/main/user-and-dev-tools).
 
 ## Recovering from data corruption
 
-If, for some reason, the shielded wallet gets corrupted and shielded sync cannot function correctly,
-a user can try to remove all local data and sync again from scratch. The shielded wallet is stored
-in the user's chain directory and the generated files have the following names:
- * `shielded.dat`
- * `shielded.tmp`
- * `speculative_shielded.dat`
- * `shielded_sync.cache`
- * `shielded_sync.cache.tmp`
+If, for some reason, the shielded wallet gets corrupted and shielded sync cannot
+function correctly, a user can try to remove all local data and sync again from
+scratch. The shielded wallet is stored in the user's chain directory and the
+generated files have the following names:
 
- If these files are deleted, shielded sync can be run in order to re-sync from scratch.
+- `shielded.dat`
+- `shielded.tmp`
+- `shielded_sync.cache`
+- `shielded_sync.cache.tmp`
+
+If these files are deleted, shielded sync can be run in order to re-sync from
+scratch.
 
 <Callout>
-Removing or modifying these files is not recommended and should only be done as a last resort.
-Also note that the user will need to provided the necessary viewing and spending keys to
-shielded sync again.
+  Removing or modifying these files is not recommended and should only be done
+  as a last resort. Also note that the user will need to provided the necessary
+  viewing and spending keys to shielded sync again.
 </Callout>
